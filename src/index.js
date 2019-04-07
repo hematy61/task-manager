@@ -1,7 +1,7 @@
 const express = require('express')
 require('./db/mongoose')
-const User = require('./models/users')
-const Task = require('./models/tasks')
+const User = require('./models/user')
+const Task = require('./models/task')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -21,7 +21,7 @@ app.post('/tasks', (req, res) => {
 
   task.save()
   .then( result => res.send(result) )
-  .catch( error => res.send(error) )
+  .catch( error => res.status(400).send(error) )
 })
 
 app.listen(port, () => {
