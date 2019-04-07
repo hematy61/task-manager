@@ -31,10 +31,15 @@ app.get('/users/:id', (req,res) => {
 
 app.post('/tasks', (req, res) => {
   const task = new Task(req.body)
-
   task.save()
   .then( result => res.status(201).send(result) )
   .catch( error => res.status(400).send(error) )
+})
+
+app.get('/tasks', (req, res) => {
+  Task.find({})
+  .then( (tasks) => res.send(tasks))
+  .catch( (error) => res.status(400).send(error) )
 })
 
 app.listen(port, () => {
