@@ -53,8 +53,8 @@ app.get('/users/:id', async (req,res) => {
 app.post('/tasks', async (req, res) => {
   const task = new Task(req.body)
   try {
-      task.save()
-      res.status(201).send(task)
+      await task.save()
+      res.status(201).send(['saved to data base', task])
   } catch (error) {
       res.status(400).send(error)
   }
@@ -79,11 +79,13 @@ app.get('/tasks/:id', async (req, res) => {
   const _id = req.params.id
   try {
       const foundedTask = await Task.findById(_id)
-      return !task ? res.status(404).send() : res.send(foundedTask)
+      return !foundedTask ? res.status(404).send(`the ${_id} was not found.`) : res.send(foundedTask)
   } catch (error) {
       res.status(500).send()
   }
 })
+
+
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}`)
