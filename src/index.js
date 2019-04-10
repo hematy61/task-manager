@@ -7,8 +7,12 @@ const Task = require('./models/task')
 const app = express()
 const port = process.env.PORT || 3000
 
+// supporting static files with Express
 app.use(express.json())
 
+// *************  CREATE A NEW USER  *************************************************************
+// With this route we are using async await to asynchronously create new users and save them in
+// users database. Uppercase "User" is the mongoose model for user authentication. 
 app.post('/users', async (req, res) => {
   const user = new User(req.body)
   try {
@@ -19,6 +23,9 @@ app.post('/users', async (req, res) => {
   }
 })
 
+// *************  FIND ALL USERS  ****************************************************************
+// With this route we are using async await to asynchronously retrieve all users and send them back
+// to front end. Uppercase "User" is the mongoose model for user authentication. 
 app.get('/users', async (req, res) => {
   try {
       const users = await User.find({})
@@ -28,15 +35,21 @@ app.get('/users', async (req, res) => {
   }
 })
 
+// *************  FIND A USER BY ID  *************************************************************
+// With this route we are using async await to asynchronously find one user by its id and send it 
+// back to front end. Uppercase "User" is the mongoose model for user authentication. 
 app.get('/users/:id', async (req,res) => {
   try {      
       const user = await User.findById(req.params.id)
-      return !user ? res.status(404).send() : res.send(user)
+      return !user ? res.status(404).send(`The id: ${req.params.id} was not found.`) : res.send(user)
   } catch (error) {
       res.status(500).send(error)
   }
 })
 
+// *************  CREATE A NEW TASK  *************************************************************
+// With this route we are using async await to asynchronously create a new task and save it to 
+// database. Uppercase "Task" is the mongoose model for user authentication.
 app.post('/tasks', async (req, res) => {
   const task = new Task(req.body)
   try {
@@ -47,6 +60,9 @@ app.post('/tasks', async (req, res) => {
   }
 })
 
+// *************  FIND ALL TASKS  ****************************************************************
+// With this route we are using async await to asynchronously retrieve all existing tasks and send
+// them to front end. Uppercase "Task" is the mongoose model for user authentication.
 app.get('/tasks', async (req, res) => {
   try {
       const tasks = await Task.find({})
@@ -56,11 +72,14 @@ app.get('/tasks', async (req, res) => {
   }
 })
 
+// *************  FIND A TASK BY ID  *************************************************************
+// With this route we are using async await to asynchronously find a task by its id and send it 
+// back to front end. Uppercase "Task" is the mongoose model for user authentication.
 app.get('/tasks/:id', async (req, res) => {
   const _id = req.params.id
   try {
       const foundedTask = await Task.findById(_id)
-      return !task ? res.status(404).send() : res.send(task)
+      return !task ? res.status(404).send() : res.send(foundedTask)
   } catch (error) {
       res.status(500).send()
   }
