@@ -150,6 +150,16 @@ app.patch('/tasks/:id', async (req, res) => {
 
 })
 
+// *************  DELETE A TASK BY ID  ***********************************************************
+app.delete('/tasks/:id', async (req, res) => {
+  try {
+    const deletedTask = await Task.findByIdAndDelete(req.params.id)
+    return !deletedTask ? res.status(404).send('Invalid User!') : res.send(deletedTask)
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
+
 app.listen(port, () => {
   console.log(`server is running on port ${port}`)
 })
