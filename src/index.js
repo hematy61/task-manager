@@ -47,7 +47,7 @@ app.get('/users/:id', async (req,res) => {
   }
 })
 
-// *************  UPDATE A USER BY ID  *************************************************************
+// *************  UPDATE A USER BY ID  ***********************************************************
 // With this route we are using async await to asynchronously find one user by its id and update the 
 // user's information. Uppercase "User" is the mongoose model for user authentication. 
 app.patch('/users/:id', async (req, res) => {
@@ -77,6 +77,17 @@ app.patch('/users/:id', async (req, res) => {
       res.status(500).send(error)
   }
 })
+
+// *************  DELETE A  USER  *****************************************************************
+app.delete('/users/:id', async (req, res) => {
+  try {
+      const deletedUser = await User.findByIdAndDelete(req.params.id)
+      return !deletedUser ? res.status(404).send('Invalid User!') : res.send(deletedUser)
+  } catch (error) {
+      res.status(404).send(error)
+  }
+})
+
 
 // *************  CREATE A NEW TASK  *************************************************************
 // With this route we are using async await to asynchronously create a new task and save it to 
@@ -116,7 +127,7 @@ app.get('/tasks/:id', async (req, res) => {
   }
 })
 
-// *************  UPDATE A TASK BY ID  *************************************************************
+// *************  UPDATE A TASK BY ID  ***********************************************************
 // description is the same as UPDATE A USER BY ID
 app.patch('/tasks/:id', async (req, res) => {
   const requestedTaskUpdate = Object.keys(req.body)
