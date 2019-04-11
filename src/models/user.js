@@ -4,6 +4,8 @@ const { isEmail } = require('validator')
 
 
 const User = mongoose.model('User',{
+  // if you add a property here make sure that you're going to update 'allowedUserUpdates' array on
+  // index.js file within 'UPDATE A USER BY ID' route
   name: {
     type: String,
     trim: true,
