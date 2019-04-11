@@ -53,13 +53,13 @@ app.get('/users/:id', async (req,res) => {
 app.patch('/users/:id', async (req, res) => {
   // Here, we want to check the requested update. If it's an invalid request like updating a key that 
   // is not exist in user keys then we want to stop the request and send an "invalid update" message to
-  // client. 'requestedUpdates are the keys of the object that has received from client to update user'
-  const requestedUpdates = Object.keys(req.body);
-  // 'allowedUpdates' are the keys that we would like client to be able to update, otherwise stop it.
-  const allowedUpdates = ['name', 'age', 'email', 'password']
-  // With 'isValidUpdateOperation, we want to see 'requestedUpdates' keys are valid within the 
-  // 'allowedUpdates' and if there is then it can be updated. otherwise reject the update.
-  const isValidUpdateOperation = requestedUpdates.every(update => allowedUpdates.includes(update))
+  // client. 'requestedUserUpdates are the keys of the object that has received from client to update user'
+  const requestedUserUpdates = Object.keys(req.body);
+  // 'allowedUserUpdates' are the keys that we would like client to be able to update, otherwise stop it.
+  const allowedUserUpdates = ['name', 'age', 'email', 'password']
+  // With 'isValidUpdateOperation, we want to see 'requestedUserUpdates' keys are valid within the 
+  // 'allowedUserUpdates' and if there is then it can be updated. otherwise reject the update.
+  const isValidUpdateOperation = requestedUserUpdates.every(update => allowedUserUpdates.includes(update))
   if (!isValidUpdateOperation) {
     return res.status(400).send('Invalid update!')
   }
@@ -116,7 +116,28 @@ app.get('/tasks/:id', async (req, res) => {
   }
 })
 
+// *************  UPDATE A TASK BY ID  *************************************************************
+// description is the same as UPDATE A USER BY ID
+app.patch('/tasks/:id', async (req, res) => {
+  const requestedTaskUpdate = Object.keys(req.body)
+  const allowedTaskUpdates = ['title', 'description', 'completed']
+  const isValidUpdateOperation = requestedTaskUpdate.every(task => allowedTaskUpdates.includes(task))
 
+  if (!isValidUpdateOperation) {
+    return res.status(400).send('Invalid update request')
+  }
+
+  try {
+      const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true
+      })
+      return !task ? res.status(400).send() : res.send(task)
+  } catch (error) {
+      res.status(500).send(error)
+  }
+
+})
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}`)
