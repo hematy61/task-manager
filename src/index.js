@@ -47,6 +47,37 @@ app.get('/users/:id', async (req,res) => {
   }
 })
 
+// *************  UPDATE A USER BY ID  *************************************************************
+// With this route we are using async await to asynchronously find one user by its id and update the 
+// user's information. Uppercase "User" is the mongoose model for user authentication. 
+app.patch('/users/:id', async (req, res) => {
+  // Here, we want to check the requested update. If it's an invalid request like updating a key that 
+  // is not exist in user keys then we want to stop the request and send an "invalid update" message to
+  // client. 'requestedUpdates are the keys of the object that has received from client to update user'
+  const requestedUpdates = Object.keys(req.body);
+  // 'allowedUpdates' are the keys that we would like client to be able to update, otherwise stop it.
+  const allowedUpdates = ['name', 'age', 'email', 'password']
+  // With 'isValidUpdateOperation, we want to see 'requestedUpdates' keys are valid within the 
+  // 'allowedUpdates' and if there is then it can be updated. otherwise reject the update.
+  const isValidUpdateOperation = requestedUpdates.every(update => allowedUpdates.includes(update))
+  if (!isValidUpdateOperation) {
+    return res.status(400).send('Invalid update!')
+  }
+
+  try {
+      const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true
+      })
+      // if findByIdAndUpdate doesn't find any record then is gonna return false. With this ternary 
+      // operator we can check user variable and if it returns false then turn it to true by ! operator
+      // and sent the error to client
+      return !user ? res.status(400).send() : res.send(['Modified user: ',user]) 
+  } catch (error) {
+      res.status(500).send(error)
+  }
+})
+
 // *************  CREATE A NEW TASK  *************************************************************
 // With this route we are using async await to asynchronously create a new task and save it to 
 // database. Uppercase "Task" is the mongoose model for user authentication.
@@ -68,7 +99,7 @@ app.get('/tasks', async (req, res) => {
       const tasks = await Task.find({})
       res.send(tasks)
   } catch (error) {
-      res.status(400).send(error)
+      res.status(500).send(error)
   }
 })
 
