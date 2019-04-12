@@ -58,11 +58,12 @@ router.patch('/users/:id', async (req, res) => {
   }
 
   try {
-      const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true
-      })
-      // if findByIdAndUpdate doesn't find any record then is gonna return false. With this ternary 
+      // as .findByIdAndUpdate is not gonna middleware, changed below line with existing code
+      // const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+      const user = await User.findById(req.params.id)
+      requestedUserUpdates.forEach((update) => user[update] = req.body[update])
+      await user.save()
+      // if findById doesn't find any record then is gonna return false. With this ternary 
       // operator we can check user variable and if it returns false then turn it to true by ! operator
       // and sent the error to client
       return !user ? res.status(400).send() : res.send(['Modified user: ', user])

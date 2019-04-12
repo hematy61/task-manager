@@ -10,3 +10,4 @@
 <p>Async/Await</p>
 <p>Modular, mountable route handlers with Express</p>
 <p>Bcrypt password hashing</p>
+<p>bcrypt use as a Mongoose middleware</p>
