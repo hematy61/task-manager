@@ -16,6 +16,18 @@ router.post('/users', async (req, res) => {
   }
 })
 
+// *************  LOG IN   ***********************************************************************
+router.post('/users/login', async (req, res) => {
+  
+  try {
+      const user = await User.findByCredentials(req.body.email, req.body.password)
+      res.send(user)
+  } catch (error) {
+      res.status(400).send()
+  }
+})
+
+
 // *************  FIND ALL USERS  ****************************************************************
 // With this route we are using async await to asynchronously retrieve all users and send them back
 // to front end. Uppercase "User" is the mongoose model for user authentication. 

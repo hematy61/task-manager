@@ -45,13 +45,28 @@ const userSchema = new mongoose.Schema({
   }
 })
 
+// checking log in email and password received from /users/login path with the users database
+userSchema.statics.findByCredentials = async (email, password) => {
+
+  const user = await User.findOne({ email })  
+  if (!user) {
+    throw new Error('Unable to login')
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password)
+  if (!isMatch) {
+    throw new Error('Unable to login')
+  }
+
+  return user
+}
+
+// hash the password before saving to data
 userSchema.pre('save', async function (next) {
   // In document middleware functions, "this" refers to the document.
   const user = this
-  console.log(user.password)
   if (user.isModified('password')) {
     user.password = await bcrypt.hash(user.password, 8)
-    console.log(user.password)
   }
 
   next()
