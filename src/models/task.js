@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 
-
-const Task = mongoose.model('Task', {
+const taskSchema = new mongoose.Schema({
   // if you add a property here make sure that you're going to update 'allowedTaskUpdates' array on
   // index.js file within 'UPDATE A TASK BY ID' route
   title: {
@@ -19,5 +18,7 @@ const Task = mongoose.model('Task', {
   }
 
 })
+
+const Task = mongoose.model('Task', taskSchema)
 
 module.exports = Task
