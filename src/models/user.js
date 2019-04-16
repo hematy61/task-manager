@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const { isEmail } = require('validator')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 
 const userSchema = new mongoose.Schema({
@@ -42,9 +43,32 @@ const userSchema = new mongoose.Schema({
         throw new Error('You must be over 18 to use this service.')
       }
     }
-  }
+  },
+  tokens: [{
+    token: {
+      type: String,
+      required: true
+    }
+  }]
+
 })
 
+
+// the other name for userSchema.methods is "instance methods" as they are accessible 
+// on instances, for example "user" in this case
+userSchema.methods.generateAuthToken = async function (params) {
+  const user = this
+  const token = jwt.sign({ _id: user._id.toString() }, 'theSecretOfSecrets')
+  
+  user.tokens = user.tokens.concat({ token })
+  await user.save()
+  return token
+}
+
+
+
+//the other name for userSchema.statics is "model methods" as they are accessible 
+// on models
 // checking log in email and password received from /users/login path with the users database
 userSchema.statics.findByCredentials = async (email, password) => {
 
