@@ -11,3 +11,4 @@
 <p>Modular, mountable route handlers with Express</p>
 <p>Bcrypt password hashing</p>
 <p>bcrypt use as a Mongoose middleware</p>
+<p>User sign in and stopping user from sign up if the email exist</p>
