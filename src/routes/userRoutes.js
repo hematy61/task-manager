@@ -3,14 +3,15 @@ const User = require('../models/user')
 const router = express.Router()
 
 
-// *************  CREATE A NEW USER  *************************************************************
+// *************  SIGN UP: CREATE A NEW USER  ****************************************************
 // With this route we are using async await to asynchronously create new users and save them in
 // users database. Uppercase "User" is the mongoose model for user authentication. 
 router.post('/users', async (req, res) => {
   const user = new User(req.body)
   try {
       await user.save()
-      res.status(201).send(user)
+      const token = await user.generateAuthToken()
+      res.status(201).send({ user, token })
   } catch (error) {
       res.status(400).send(error)
   }
