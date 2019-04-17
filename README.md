@@ -14,3 +14,4 @@
 <p>User sign in and stopping user from sign up if the email exist</p>
 <p>JWT: JSON Web Token to support user login</p>
 <p>Supporting multiple logins from different devices and keep all logged in if user logged out from only one account</p>
+<p>Express middleware</p>
