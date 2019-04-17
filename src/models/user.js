@@ -53,6 +53,20 @@ const userSchema = new mongoose.Schema({
 
 })
 
+// .toJSON is a mongoose method that returns an object and here we first change the document (user) to an object 
+// and then delete the keys that we don't want to be sent to front end like 'password' and then send the new
+// object. this is gonna run for any query over the user data
+
+userSchema.methods.toJSON = function () {
+  const user = this
+  const userObject = user.toObject()
+
+  delete userObject.password
+  delete userObject.tokens
+
+  return userObject
+}
+
 
 // the other name for userSchema.methods is "instance methods" as they are accessible 
 // on instances, for example "user" in this case

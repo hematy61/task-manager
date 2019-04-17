@@ -30,7 +30,7 @@ router.post('/users/login', async (req, res) => {
   }
 })
 
-// *************  LOG OUT   **********************************************************************
+// *************  LOG OUT One Device  ************************************************************
 router.post('/users/logout', auth, async (req, res) => {
 try {
     req.user.tokens = req.user.tokens.filter( token => {
@@ -41,6 +41,17 @@ try {
 } catch (error) {
     res.status(500).send(error)
 }
+})
+
+// *************  LOG OUT All Devices  ***********************************************************
+router.post('/users/logoutAll', auth, async (req, res) => {
+  try {
+      req.user.tokens = []
+      await req.user.save()
+      res.send('Logged out of all accounts has successfully done.')
+  } catch (error) {
+      res.status(500).send(error)
+  }
 })
 
 // *************  FIND Auth Logged In User Profile  **********************************************
