@@ -24,6 +24,7 @@ const auth = async (req, res, next) => {
       // to do so, we define another variable for 'req' and assign the user 
       // to that like so:
       req.user = user
+      req.token = token
       next()
   } catch (error) {
       res.status(401).send('Error: User Not Authenticated')
