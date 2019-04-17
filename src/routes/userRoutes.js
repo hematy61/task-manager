@@ -61,18 +61,6 @@ router.get('/users/me', auth, async (req, res) => {
   res.send(req.user)
 })
 
-// *************  FIND A USER BY ID  *************************************************************
-// With this route we are using async await to asynchronously find one user by its id and send it 
-// back to front end. Uppercase "User" is the mongoose model for user authentication. 
-router.get('/users/:id', async (req, res) => {
-  try {
-      const user = await User.findById(req.params.id)
-      return !user ? res.status(404).send(`The id: ${req.params.id} was not found.`) : res.send(user)
-  } catch (error) {
-      res.status(500).send(error)
-  }
-})
-
 // *************  UPDATE A USER BY ID  ***********************************************************
 // With this route we are using async await to asynchronously find one user by its id and update the 
 // user's information. Uppercase "User" is the mongoose model for user authentication. 
