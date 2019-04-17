@@ -61,13 +61,15 @@ router.get('/users/me', auth, async (req, res) => {
   res.send(req.user)
 })
 
-// *************  UPDATE A USER BY ID  ***********************************************************
+// *************  UPDATE A LOGGED IN USER  ***********************************************************
 // With this route we are using async await to asynchronously find one user by its id and update the 
 // user's information. Uppercase "User" is the mongoose model for user authentication. 
-router.patch('/users/:id', async (req, res) => {
+router.patch('/users/me', auth, async (req, res) => {
   // Here, we want to check the requested update. If it's an invalid request like updating a key that 
   // is not exist in user keys then we want to stop the request and send an "invalid update" message to
   // client. 'requestedUserUpdates are the keys of the object that has received from client to update user'
+  console.log(req.body);
+  
   const requestedUserUpdates = Object.keys(req.body);
   // 'allowedUserUpdates' are the keys that we would like client to be able to update, otherwise stop it.
   const allowedUserUpdates = ['name', 'age', 'email', 'password']
@@ -79,15 +81,11 @@ router.patch('/users/:id', async (req, res) => {
   }
 
   try {
-      // as .findByIdAndUpdate is not gonna middleware, changed below line with existing code
+      // as .findByIdAndUpdate is not gonna fire middleware, changed below line with existing forEach code
       // const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
-      const user = await User.findById(req.params.id)
-      requestedUserUpdates.forEach((update) => user[update] = req.body[update])
-      await user.save()
-      // if findById doesn't find any record then is gonna return false. With this ternary 
-      // operator we can check user variable and if it returns false then turn it to true by ! operator
-      // and sent the error to client
-      return !user ? res.status(400).send() : res.send(['Modified user: ', user])
+      requestedUserUpdates.forEach((update) => req.user[update] = req.body[update])
+      await req.user.save()
+      res.send(['Modified user: ', req.user])
   } catch (error) {
       res.status(500).send(error)
   }
