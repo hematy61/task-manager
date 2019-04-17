@@ -93,11 +93,11 @@ router.patch('/users/:id', async (req, res) => {
   }
 })
 
-// *************  DELETE A  USER  *****************************************************************
-router.delete('/users/:id', async (req, res) => {
+// *************  DELETE USER PROFILE  ***********************************************************
+router.delete('/users/me', auth, async (req, res) => {
   try {
-      const deletedUser = await User.findByIdAndDelete(req.params.id)
-      return !deletedUser ? res.status(404).send('Invalid User!') : res.send(deletedUser)
+      await req.user.remove()
+      res.send(req.user)
   } catch (error) {
       res.status(404).send(error)
   }
