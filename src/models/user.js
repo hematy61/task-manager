@@ -52,6 +52,8 @@ const userSchema = new mongoose.Schema({
     }
   }]
 
+},{
+  timestamps: true
 })
 
 // .toJSON is a mongoose method that returns an object and here we first change the document (user) to an object 
@@ -68,7 +70,6 @@ userSchema.methods.toJSON = function () {
   return userObject
 }
 
-
 // the other name for userSchema.methods is "instance methods" as they are accessible 
 // on instances, for example "user" in this case
 userSchema.methods.generateAuthToken = async function (params) {
@@ -79,8 +80,6 @@ userSchema.methods.generateAuthToken = async function (params) {
   await user.save()
   return token
 }
-
-
 
 //the other name for userSchema.statics is "model methods" as they are accessible 
 // on models
