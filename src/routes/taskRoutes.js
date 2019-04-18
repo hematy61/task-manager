@@ -23,9 +23,9 @@ router.post('/tasks', auth, async (req, res) => {
 // *************  FIND ALL TASKS  ****************************************************************
 // With this route we are using async await to asynchronously retrieve all existing tasks and send
 // them to front end. Uppercase "Task" is the mongoose model for user authentication.
-router.get('/tasks', async (req, res) => {
+router.get('/tasks', auth, async (req, res) => {
   try {
-      const tasks = await Task.find({})
+      const tasks = await Task.find({owner: req.user._id})
       res.send(tasks)
   } catch (error) {
       res.status(500).send(error)
@@ -48,7 +48,7 @@ router.get('/tasks/:id', auth, async (req, res) => {
 
 // *************  UPDATE A TASK BY ID  ***********************************************************
 // description is the same as UPDATE A USER BY ID
-router.patch('/tasks/:id', async (req, res) => {
+router.patch('/tasks/:id',auth,  async (req, res) => {
   const requestedTaskUpdate = Object.keys(req.body)
   const allowedTaskUpdates = ['title', 'description', 'completed']
   const isValidUpdateOperation = requestedTaskUpdate.every(task => allowedTaskUpdates.includes(task))
@@ -60,10 +60,14 @@ router.patch('/tasks/:id', async (req, res) => {
   try {
       // change the below line of code as findByIdAndUpdate is not fire middleware
       // const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
-      const task = await Task.findById(req.params.id)
+      // const task = await Task.findById(req.params.id)
+      const task = await Task.findOne({_id: req.params.id, owner: req.user._id})
+      if (!task) {
+        return res.status(400).send()
+      }
       requestedTaskUpdate.forEach(update => task[update] = req.body[update])
       await task.save()
-      return !task ? res.status(400).send() : res.send(task)
+      res.send(task)
   } catch (error) {
       res.status(500).send(error)
   }
@@ -71,9 +75,9 @@ router.patch('/tasks/:id', async (req, res) => {
 })
 
 // *************  DELETE A TASK BY ID  ***********************************************************
-router.delete('/tasks/:id', async (req, res) => {
+router.delete('/tasks/:id', auth, async (req, res) => {
   try {
-      const deletedTask = await Task.findByIdAndDelete(req.params.id)
+      const deletedTask = await Task.findOneAndDelete({_id: req.params.id, owner: req.user._id})
       return !deletedTask ? res.status(404).send('Invalid User!') : res.send(deletedTask)
   } catch (error) {
       res.status(500).send(error)
