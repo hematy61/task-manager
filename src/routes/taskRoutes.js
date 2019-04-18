@@ -1,12 +1,17 @@
 const express = require('express')
 const Task = require('../models/task')
+const auth = require('../middleware/auth')
 const router = express.Router()
 
 // *************  CREATE A NEW TASK  *************************************************************
 // With this route we are using async await to asynchronously create a new task and save it to 
 // database. Uppercase "Task" is the mongoose model for user authentication.
-router.post('/tasks', async (req, res) => {
-  const task = new Task(req.body)
+router.post('/tasks', auth, async (req, res) => {
+  // const task = new Task(req.body)
+  const task = new Task({
+    ...req.body,
+    owner: req.user._id
+  })
   try {
       await task.save()
       res.status(201).send(['saved to data base', task])
@@ -30,10 +35,11 @@ router.get('/tasks', async (req, res) => {
 // *************  FIND A TASK BY ID  *************************************************************
 // With this route we are using async await to asynchronously find a task by its id and send it 
 // back to front end. Uppercase "Task" is the mongoose model for user authentication.
-router.get('/tasks/:id', async (req, res) => {
+router.get('/tasks/:id', auth, async (req, res) => {
   const _id = req.params.id
   try {
-      const foundedTask = await Task.findById(_id)
+      // query over Tasks and find the task by its id if its owner is the right owner. 
+      const foundedTask = await Task.findOne({ _id, owner: req.user._id })
       return !foundedTask ? res.status(404).send(`the ${_id} was not found.`) : res.send(foundedTask)
   } catch (error) {
       res.status(500).send()
