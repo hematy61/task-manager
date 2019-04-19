@@ -11,11 +11,11 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     trim: true,
-    required: [true, 'User Name required'],
+    required: [true, 'Name required'],
   },
   email: {
     type: String,
-    required: [true, 'User email required'],
+    required: [true, 'email required'],
     unique: true,
     trim: true,
     lowercase: true,
@@ -72,7 +72,7 @@ userSchema.methods.toJSON = function () {
 
 // the other name for userSchema.methods is "instance methods" as they are accessible 
 // on instances, for example "user" in this case
-userSchema.methods.generateAuthToken = async function (params) {
+userSchema.methods.generateAuthToken = async function () {
   const user = this
   const token = jwt.sign({ _id: user._id.toString() }, 'theSecretOfSecrets')
   

@@ -24,9 +24,18 @@ router.post('/tasks', auth, async (req, res) => {
 // With this route we are using async await to asynchronously retrieve all existing tasks and send
 // them to front end. Uppercase "Task" is the mongoose model for user authentication.
 router.get('/tasks', auth, async (req, res) => {
+  console.log(req.query.completed);
+  
+  
   try {
       const tasks = await Task.find({owner: req.user._id})
-      res.send(tasks)
+      .then(tasks => {
+        if (req.query.completed) {
+          return tasks.filter( task => task.completed.toString() === req.query.completed )
+        }
+        return tasks
+      })
+      return res.send(tasks)
   } catch (error) {
       res.status(500).send(error)
   }
