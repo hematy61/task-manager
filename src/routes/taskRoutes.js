@@ -37,9 +37,20 @@ router.get('/tasks', auth, async (req, res) => {
       // return res.send(tasks)
     
     // the Second approach is 'populate()' mongoose method.
-    console.log('req.user is: __________________________________', req.user)
-    await req.user.populate('tasks').execPopulate()
-    console.log('req.user.tasks is: __________________________________', req.user.tasks)
+      // path: 'tasks' is a reference for populate to "userSchema.virtual('tasks')"
+      // match: optional query conditions to match and it can be an Object or a function. Here it is set
+      // to the match constant object to handle queries the we receive
+    const match ={}
+
+    if (req.query.completed) {
+      // the other approach is match.completed = JSON.parse(req.query.completed) 
+      match.completed = req.query.completed === 'true'
+    }
+
+    await req.user.populate({
+      path: 'tasks',
+      match
+    }).execPopulate()
     res.send(req.user.tasks)
   } catch (error) {
       res.status(500).send(error)
