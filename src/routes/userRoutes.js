@@ -11,7 +11,7 @@ router.post('/users', async (req, res) => {
   const user = new User(req.body)
   try {
       await user.save()
-      // const token = await user.generateAuthToken()
+      // 307 guarantees that the method and the body will not be changed when the redirected request is made
       res.status(201).redirect(307, '/users/login')
   } catch (error) {
       res.status(400).send(error)
@@ -68,7 +68,6 @@ router.patch('/users/me', auth, async (req, res) => {
   // Here, we want to check the requested update. If it's an invalid request like updating a key that 
   // is not exist in user keys then we want to stop the request and send an "invalid update" message to
   // client. 'requestedUserUpdates are the keys of the object that has received from client to update user'
-  console.log(req.body);
   
   const requestedUserUpdates = Object.keys(req.body);
   // 'allowedUserUpdates' are the keys that we would like client to be able to update, otherwise stop it.

@@ -56,6 +56,12 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 })
 
+userSchema.virtual('tasks', {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'owner'
+})
+
 // .toJSON is a mongoose method that returns an object and here we first change the document (user) to an object 
 // and then delete the keys that we don't want to be sent to front end like 'password' and then send the new
 // object. this is gonna run for any query over the user data
