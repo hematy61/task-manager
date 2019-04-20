@@ -24,6 +24,17 @@ router.post('/tasks', auth, async (req, res) => {
 // With this route we are using async await to asynchronously retrieve all existing tasks and send
 // them to front end. Uppercase "Task" is the mongoose model for user authentication.
 router.get('/tasks', auth, async (req, res) => {
+  const match = {}
+  const sort = {}
+
+  if (req.query.completed) {
+    // the other approach is match.completed = JSON.parse(req.query.completed) 
+    match.completed = req.query.completed === 'true'
+  }
+
+  if (req.query.sortBy) {
+    sort.createdAt = parseInt(req.query.sortBy)
+  }
   
   try {
     // this is one approach that is finding all tasks by a specific user with 'find' method. 
@@ -40,19 +51,13 @@ router.get('/tasks', auth, async (req, res) => {
       // path: 'tasks' is a reference for populate to "userSchema.virtual('tasks')"
       // match: optional query conditions to match and it can be an Object or a function. Here it is set
       // to the match constant object to handle queries the we receive
-    const match ={}
-
-    if (req.query.completed) {
-      // the other approach is match.completed = JSON.parse(req.query.completed) 
-      match.completed = req.query.completed === 'true'
-    }
-
     await req.user.populate({
       path: 'tasks',
       match,
       options: {
         limit: parseInt(req.query.limit),
-        skip: parseInt(req.query.skip)
+        skip: parseInt(req.query.skip),
+        sort
       }
     }).execPopulate()
     res.send(req.user.tasks)
