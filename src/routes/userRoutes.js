@@ -1,4 +1,5 @@
 const express = require('express')
+const multer = require('multer')
 const User = require('../models/user')
 const auth = require('../middleware/auth')
 const router = express.Router()
@@ -99,6 +100,32 @@ router.delete('/users/me', auth, async (req, res) => {
       res.status(404).send(error)
   }
 })
+
+// *************  SAVE USER PROFILE AVATAR  ******************************************************
+// setting up multer to save uploaded avatar images
+const upload = multer({
+  limits: {
+    fileSize: 1000000
+  },
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
+      return cb(new Error('file type must be .png or .jpg or jpeg'))
+    }
+    cb(null, true)
+  }
+})
+
+router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
+  // after multer validate the file, as we don't have " dist: " specified for multer, it passes the file
+  // to the next function. we access to that through "req.file.buffer" and the we add and save it to user.avatar 
+  // database
+  req.user.avatar = req.file.buffer
+  await req.user.save()
+  res.send('file uploaded')
+}, (error, req, res, next) => {
+  res.status(400).send({ error: error.message })
+})
+
 
 
 module.exports = router
