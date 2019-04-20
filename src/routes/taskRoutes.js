@@ -48,7 +48,7 @@ router.get('/tasks', auth, async (req, res) => {
       // return res.send(tasks)
     
     // the Second approach is 'populate()' mongoose method.
-      // path: 'tasks' is a reference for populate to "userSchema.virtual('tasks')"
+      // " path: 'tasks' " is a reference for populate to " userSchema.virtual('tasks') "
       // match: optional query conditions to match and it can be an Object or a function. Here it is set
       // to the match constant object to handle queries the we receive
     await req.user.populate({
