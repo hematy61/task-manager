@@ -1,5 +1,6 @@
 const express = require('express')
 const multer = require('multer')
+const sharp = require('sharp')
 const User = require('../models/user')
 const auth = require('../middleware/auth')
 const router = express.Router()
@@ -116,10 +117,11 @@ const upload = multer({
 })
 
 router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
+  const buffer = await sharp(req.file.buffer).png().toBuffer()
   // after multer validate the file, as we don't have " dist: " specified for multer, it passes the file
   // to the next function. we access to that through "req.file.buffer" and the we add and save it to user.avatar 
   // database
-  req.user.avatar = req.file.buffer
+  req.user.avatar = buffer
   await req.user.save()
   res.send('file uploaded')
 }, (error, req, res, next) => {
@@ -141,7 +143,7 @@ router.get('/users/:id/avatar', async (req, res) => {
       if (!user || !user.avatar) {
         return new Error()
       }
-      res.set('Content-Type', 'image/jpg')
+      res.set('Content-Type', 'image/png')
       res.send(user.avatar)
   } catch (error) {
       res.status(400).send(error)
