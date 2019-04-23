@@ -3,6 +3,7 @@ const multer = require('multer')
 const sharp = require('sharp')
 const User = require('../models/user')
 const auth = require('../middleware/auth')
+const { sendWelcomeEmail } = require('../emails/emails')
 const router = express.Router()
 
 
@@ -13,6 +14,7 @@ router.post('/users', async (req, res) => {
   const user = new User(req.body)
   try {
       await user.save()
+      sendWelcomeEmail(user.email, user.name)
       // 307 guarantees that the method and the body will not be changed when the redirected request is made
       res.status(201).redirect(307, '/users/login')
   } catch (error) {
