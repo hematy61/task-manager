@@ -9,7 +9,7 @@ const auth = async (req, res, next) => {
       // verifying the token with our secret key that we used once we have 
       // created the token part of the "generateAuthToken" instance method
       // under the /models/user.js
-      const decoded = jwt.verify(token, 'theSecretOfSecrets')
+      const decoded = jwt.verify(token, process.env.JWT_SECRET)
       // searching for a user by its id after the token is verified and its 
       // token as we are going to delete the token after user logged out and 
       // we don't want them to log in with expired token.
