@@ -30,3 +30,11 @@ test('Should login user', async () => {
   })
   .expect(200)
 })
+
+test('Should not login nonexistent user', async () => {
+  await request(app).post('/users/login').send({
+    email: "notExist@email.ca",
+    password: 'notExist'
+  })
+  .expect(400)
+})
