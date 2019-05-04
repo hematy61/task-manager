@@ -68,3 +68,10 @@ test('Should delete user account', async () => {
           .send()
           .expect(200)
 })
+
+test('Should not delete user for unauthenticated user', async () => {
+  await request(app)
+          .delete('/users/me')
+          .send()
+          .expect(401)
+})
