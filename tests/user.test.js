@@ -16,7 +16,7 @@ const userOne = {
   }]
 }
 
-beforeEach( async () => {
+beforeAll( async () => {
   await User.deleteMany()
   await new User(userOne).save()
 })
