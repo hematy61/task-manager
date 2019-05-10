@@ -113,6 +113,7 @@ test('Should upload avatar image', async () => {
   const user = await User.findById(userOneId)
   expect(user.avatar).toEqual(expect.any(Buffer))
 })
+
 test('Should update valid user fields', async () => {
   await request(app)
           .patch('/users/me')
@@ -124,4 +125,14 @@ test('Should update valid user fields', async () => {
             age: 40
           })
           .expect(200)
+})
+
+test('Should not update invalid user fields', async () => {
+  await request(app)
+          .patch('/users/me')
+          .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+          .send({
+            value: 20 
+          })
+          .expect(400)
 })
