@@ -1,48 +1,40 @@
 const request = require('supertest')
-const mongoose = require('mongoose')
-const jwt = require('jsonwebtoken')
 const app = require('../src/app')
 const User = require('../src/models/user')
+const {
+  userOne,
+  userOneId,
+  setupDatabase
+} = require('./fixtures/db')
 
-const userOneId = new mongoose.Types.ObjectId()
-const userOne = {
-  _id: userOneId,
-  name: 'Andy',
-  email: 'andytest@test.ca',
-  password: 'TestCase1!!',
-  age: 20,
-  tokens: [{
-    token: jwt.sign({ _id: userOneId}, process.env.JWT_SECRET)
-  }]
-}
-beforeEach( async () => {
-  await User.deleteMany()
-  await new User(userOne).save()
-})
+
+beforeEach(setupDatabase)
 
 test('should sign up a new user', async () => {
   await request(app)
-          .post('/users')
-          .send({
-            name: 'Mo',
-            email: 'moTest1@test.com',
-            password: 'SomePass12!!',
-            age: 19
-          })
-          .expect(307)
+    .post('/users')
+    .send({
+      name: 'Mo',
+      email: 'moTest1@test.com',
+      password: 'SomePass12!!',
+      age: 19
+    })
+    .expect(307)
 })
 
 test('Should login user', async () => {
   const response = await request(app)
-          .post('/users/login')
-          .send({
-            email: userOne.email,
-            password: userOne.password
-          })
-          .expect(200)
+    .post('/users/login')
+    .send({
+      email: userOne.email,
+      password: userOne.password
+    })
+    .expect(200)
+
   // Assert that the database was changed correctly
   const user = await User.findById(response.body.user._id)
   expect(user).not.toBeNull()
+
   // Assertions about the response
   expect(response.body).toMatchObject({
     user: {
@@ -62,35 +54,35 @@ test('Should login user', async () => {
 
 test('Should not login nonexistent user', async () => {
   await request(app)
-          .post('/users/login')
-          .send({
-            email: "notExist@email.ca",
-            password: 'notExist'
-          })
-          .expect(400)
+    .post('/users/login')
+    .send({
+      email: "notExist@email.ca",
+      password: 'notExist'
+    })
+    .expect(400)
 })
 
 test('Should get user profile', async () => {
   await request(app)
-          .get('/users/me')
-          .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
-          .send()
-          .expect(200)
+    .get('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send()
+    .expect(200)
 })
 
 test('Should not get profile for unauthenticated user', async () => {
   await request(app)
-          .get('/users/me')
-          .send()
-          .expect(401)
+    .get('/users/me')
+    .send()
+    .expect(401)
 })
 
 test('Should delete user account', async () => {
   const response = await request(app)
-          .delete('/users/me')
-          .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
-          .send()
-          .expect(200)
+    .delete('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send()
+    .expect(200)
 
   // Assertion about validating user successfully was removed
   const user = await User.findById(userOneId)
@@ -99,40 +91,40 @@ test('Should delete user account', async () => {
 
 test('Should not delete user for unauthenticated user', async () => {
   await request(app)
-          .delete('/users/me')
-          .send()
-          .expect(401)
+    .delete('/users/me')
+    .send()
+    .expect(401)
 })
 
 test('Should upload avatar image', async () => {
   await request(app)
-          .post('/users/me/avatar')
-          .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
-          .attach('avatar', 'tests/fixtures/profile-pic.jpg')
-          .expect(200)
+    .post('/users/me/avatar')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .attach('avatar', 'tests/fixtures/profile-pic.jpg')
+    .expect(200)
   const user = await User.findById(userOneId)
   expect(user.avatar).toEqual(expect.any(Buffer))
 })
 
 test('Should update valid user fields', async () => {
   await request(app)
-          .patch('/users/me')
-          .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
-          .send({
-            name: 'Gary',
-            email: 'garytest@test.ca',
-            password: 'TestCase2!!',
-            age: 40
-          })
-          .expect(200)
+    .patch('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send({
+      name: 'Gary',
+      email: 'garytest@test.ca',
+      password: 'TestCase2!!',
+      age: 40
+    })
+    .expect(200)
 })
 
 test('Should not update invalid user fields', async () => {
   await request(app)
-          .patch('/users/me')
-          .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
-          .send({
-            value: 20 
-          })
-          .expect(400)
+    .patch('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send({
+      value: 20
+    })
+    .expect(400)
 })

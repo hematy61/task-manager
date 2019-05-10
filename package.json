@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "env-cmd ./config/dev.env nodemon src/index.js",
-    "test": "env-cmd ./config/test.env jest --detectOpenHandles --watch"
+    "test": "env-cmd ./config/test.env jest --detectOpenHandles --watch --runInBand"
   },
   "jest": {
     "testEnvironment": "node",
