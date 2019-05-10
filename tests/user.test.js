@@ -15,31 +15,34 @@ const userOne = {
     token: jwt.sign({ _id: userOneId}, process.env.JWT_SECRET)
   }]
 }
-
-beforeAll( async () => {
+beforeEach( async () => {
   await User.deleteMany()
   await new User(userOne).save()
 })
 
 test('should sign up a new user', async () => {
-  await request(app).post('/users').send({
-    name: 'Mo',
-    email: 'moTest1@test.com',
-    password: 'SomePass12!!',
-    age: 19
-  }).expect(307)
+  await request(app)
+          .post('/users')
+          .send({
+            name: 'Mo',
+            email: 'moTest1@test.com',
+            password: 'SomePass12!!',
+            age: 19
+          })
+          .expect(307)
 })
 
 test('Should login user', async () => {
-  const response = await request(app).post('/users/login').send({
-    email: userOne.email,
-    password: userOne.password
-  })
-  .expect(200)
+  const response = await request(app)
+          .post('/users/login')
+          .send({
+            email: userOne.email,
+            password: userOne.password
+          })
+          .expect(200)
   // Assert that the database was changed correctly
   const user = await User.findById(response.body.user._id)
   expect(user).not.toBeNull()
-
   // Assertions about the response
   expect(response.body).toMatchObject({
     user: {
@@ -58,11 +61,13 @@ test('Should login user', async () => {
 })
 
 test('Should not login nonexistent user', async () => {
-  await request(app).post('/users/login').send({
-    email: "notExist@email.ca",
-    password: 'notExist'
-  })
-  .expect(400)
+  await request(app)
+          .post('/users/login')
+          .send({
+            email: "notExist@email.ca",
+            password: 'notExist'
+          })
+          .expect(400)
 })
 
 test('Should get user profile', async () => {
@@ -97,4 +102,14 @@ test('Should not delete user for unauthenticated user', async () => {
           .delete('/users/me')
           .send()
           .expect(401)
+})
+
+test('Should upload avatar image', async () => {
+  await request(app)
+          .post('/users/me/avatar')
+          .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+          .attach('avatar', 'tests/fixtures/profile-pic.jpg')
+          .expect(200)
+  const user = await User.findById(userOneId)
+  expect(user.avatar).toEqual(expect.any(Buffer))
 })

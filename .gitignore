@@ -4,3 +4,4 @@ Playground
 .gitignore
 config
 HEROKU_CONFIG_ENV.env
+.DS_Store
