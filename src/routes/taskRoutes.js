@@ -13,10 +13,10 @@ router.post('/tasks', auth, async (req, res) => {
     owner: req.user._id
   })
   try {
-      await task.save()
-      res.status(201).send(['saved to data base', task])
+    await task.save()
+    res.status(201).send(['saved to data base', task])
   } catch (error) {
-      res.status(400).send(error)
+    res.status(400).send(error)
   }
 })
 
@@ -35,22 +35,22 @@ router.get('/tasks', auth, async (req, res) => {
   if (req.query.sortBy) {
     sort.createdAt = parseInt(req.query.sortBy)
   }
-  
+
   try {
     // this is one approach that is finding all tasks by a specific user with 'find' method. 
-      // const tasks = await Task.find({owner: req.user._id})
-      // .then(tasks => {
-      //   if (req.query.completed) {
-      //     return tasks.filter( task => task.completed.toString() === req.query.completed )
-      //   }
-      //   return tasks
-      // })
-      // return res.send(tasks)
-    
+    // const tasks = await Task.find({owner: req.user._id})
+    // .then(tasks => {
+    //   if (req.query.completed) {
+    //     return tasks.filter( task => task.completed.toString() === req.query.completed )
+    //   }
+    //   return tasks
+    // })
+    // return res.send(tasks)
+
     // the Second approach is 'populate()' mongoose method.
-      // " path: 'tasks' " is a reference for populate to " userSchema.virtual('tasks') "
-      // match: optional query conditions to match and it can be an Object or a function. Here it is set
-      // to the match constant object to handle queries the we receive
+    // " path: 'tasks' " is a reference for populate to " userSchema.virtual('tasks') "
+    // match: optional query conditions to match and it can be an Object or a function. Here it is set
+    // to the match constant object to handle queries the we receive
     await req.user.populate({
       path: 'tasks',
       match,
@@ -62,7 +62,7 @@ router.get('/tasks', auth, async (req, res) => {
     }).execPopulate()
     res.send(req.user.tasks)
   } catch (error) {
-      res.status(500).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -72,17 +72,20 @@ router.get('/tasks', auth, async (req, res) => {
 router.get('/tasks/:id', auth, async (req, res) => {
   const _id = req.params.id
   try {
-      // query over Tasks and find the task by its id if its owner is the right owner. 
-      const foundedTask = await Task.findOne({ _id, owner: req.user._id })
-      return !foundedTask ? res.status(404).send(`the ${_id} was not found.`) : res.send(foundedTask)
+    // query over Tasks and find the task by its id if its owner is the right owner. 
+    const foundedTask = await Task.findOne({
+      _id,
+      owner: req.user._id
+    })
+    return !foundedTask ? res.status(404).send(`the ${_id} was not found.`) : res.send(foundedTask)
   } catch (error) {
-      res.status(500).send()
+    res.status(500).send()
   }
 })
 
 // *************  UPDATE A TASK BY ID  ***********************************************************
 // description is the same as UPDATE A USER BY ID
-router.patch('/tasks/:id',auth,  async (req, res) => {
+router.patch('/tasks/:id', auth, async (req, res) => {
   const requestedTaskUpdate = Object.keys(req.body)
   const allowedTaskUpdates = ['title', 'description', 'completed']
   const isValidUpdateOperation = requestedTaskUpdate.every(task => allowedTaskUpdates.includes(task))
@@ -92,18 +95,21 @@ router.patch('/tasks/:id',auth,  async (req, res) => {
   }
 
   try {
-      // change the below line of code as findByIdAndUpdate is not fire middleware
-      // const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
-      // const task = await Task.findById(req.params.id)
-      const task = await Task.findOne({_id: req.params.id, owner: req.user._id})
-      if (!task) {
-        return res.status(400).send()
-      }
-      requestedTaskUpdate.forEach(update => task[update] = req.body[update])
-      await task.save()
-      res.send(task)
+    // change the below line of code as findByIdAndUpdate is not fire middleware
+    // const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+    // const task = await Task.findById(req.params.id)
+    const task = await Task.findOne({
+      _id: req.params.id,
+      owner: req.user._id
+    })
+    if (!task) {
+      return res.status(400).send()
+    }
+    requestedTaskUpdate.forEach(update => task[update] = req.body[update])
+    await task.save()
+    res.send(task)
   } catch (error) {
-      res.status(500).send(error)
+    res.status(500).send(error)
   }
 
 })
@@ -111,10 +117,13 @@ router.patch('/tasks/:id',auth,  async (req, res) => {
 // *************  DELETE A TASK BY ID  ***********************************************************
 router.delete('/tasks/:id', auth, async (req, res) => {
   try {
-      const deletedTask = await Task.findOneAndDelete({_id: req.params.id, owner: req.user._id})
-      return !deletedTask ? res.status(404).send('Invalid User!') : res.send(deletedTask)
+    const deletedTask = await Task.findOneAndDelete({
+      _id: req.params.id,
+      owner: req.user._id
+    })
+    return !deletedTask ? res.status(404).send('Invalid User!') : res.send(deletedTask)
   } catch (error) {
-      res.status(500).send(error)
+    res.status(500).send(error)
   }
 })
 

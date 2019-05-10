@@ -26,3 +26,16 @@ test('Should create a new task', async () => {
   // Assertion about default task completed field that must be false when user is not providing a value
   expect(task.completed).toEqual(false)
 })
+
+test('Should get all tasks for user one', async () => {
+  const response = await request(app)
+    .get('/tasks')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send()
+    .expect(200)
+
+  const tasks = response.body
+
+  // Assertion about the length of the task which must be 2
+  expect(tasks.length).toEqual(2)
+})
